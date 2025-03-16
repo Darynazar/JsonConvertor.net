@@ -33,6 +33,19 @@ namespace Json.Services
                 Standings = new List<StandingSchema>()
             };
 
+            // Step 1: Extract the country information from the input JSON
+            var country = nodeJson.Countries?.FirstOrDefault();
+            if (country == null)
+            {
+                throw new ArgumentException("Country information is missing in the input JSON.");
+            }
+
+            // Step 2: Use the extracted country information
+            string countryName = country.Name;
+            string countrySlug = country.NameForURL;
+            string countryFlag = countrySlug; // Assuming the flag is the same as the slug
+            string countryAlpha2 = GetAlpha2Code(countryName); // Helper method to get Alpha2 code
+
             foreach (var standing in nodeJson.Standings)
             {
                 var standingSchema = new StandingSchema
@@ -44,26 +57,27 @@ namespace Json.Services
                         Category = new Category
                         {
                             Id = 1,
-                            Name = "England",
-                            Slug = "england",
+                            Name = countryName, // Dynamic
+                            Slug = countrySlug, // Dynamic
                             Sport = new Sport
                             {
                                 Name = "Football",
                                 Slug = "football",
                                 Id = 1
                             },
-                            Flag = "england",
-                            Alpha2 = "EN",
+                            Flag = countryFlag, // Dynamic
+                            Alpha2 = countryAlpha2, // Dynamic
                             FieldTranslations = new FieldTranslations
                             {
                                 NameTranslation = new NameTranslation
                                 {
-                                    Ar = "إنجلترا",
+                                    Ar = "إنجلترا", // You can make this dynamic too if needed
                                     Hi = "इंग्लैंड",
                                     Bn = "ইংল্যান্ড"
                                 },
                                 ShortNameTranslation = new object()
                             },
+                         
                         },
                         UniqueTournament = new UniqueTournament
                         {
@@ -74,16 +88,16 @@ namespace Json.Services
                             Category = new Category
                             {
                                 Id = 1,
-                                Name = "England",
-                                Slug = "england",
+                                Name = countryName, // Dynamic
+                                Slug = countrySlug, // Dynamic
                                 Sport = new Sport
                                 {
                                     Name = "Football",
                                     Slug = "football",
                                     Id = 1
                                 },
-                                Flag = "england",
-                                Alpha2 = "EN",
+                                Flag = countryFlag, // Dynamic
+                                Alpha2 = countryAlpha2, // Dynamic
                                 FieldTranslations = new FieldTranslations
                                 {
                                     NameTranslation = new NameTranslation
@@ -94,6 +108,7 @@ namespace Json.Services
                                     },
                                     ShortNameTranslation = new object()
                                 },
+                         
                             },
                             UserCount = 1328140,
                             HasPerformanceGraphFeature = true,
@@ -110,6 +125,7 @@ namespace Json.Services
                                 },
                                 ShortNameTranslation = new object()
                             },
+                        
                         },
                         Priority = 618,
                         IsGroup = false,
@@ -125,6 +141,7 @@ namespace Json.Services
                             },
                             ShortNameTranslation = new object()
                         },
+               
                     },
                     Name = standing.DisplayName,
                     Type = "total",
@@ -137,6 +154,7 @@ namespace Json.Services
                     Rows = new List<RowSchema>(),
                     Id = 126654,
                     UpdatedAtTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                
                 };
 
                 foreach (var row in standing.Rows)
@@ -163,10 +181,10 @@ namespace Json.Services
                             Id = row.Competitor.Id,
                             Country = new Country
                             {
-                                Alpha2 = "EN",
-                                Alpha3 = "ENG",
-                                Name = "England",
-                                Slug = "england"
+                                Alpha2 = countryAlpha2, // Dynamic
+                                Alpha3 = GetAlpha3Code(countryName), // Dynamic
+                                Name = countryName, // Dynamic
+                                Slug = countrySlug // Dynamic
                             },
                             EntityType = "team",
                             TeamColors = new TeamColors
@@ -191,6 +209,7 @@ namespace Json.Services
                                     Bn = "লিভারপুল"
                                 }
                             },
+                       
                         },
                         Descriptions = new List<object>(),
                         Promotion = new Promotion
@@ -208,6 +227,7 @@ namespace Json.Services
                         Draws = row.GamesEven,
                         Points = (int)row.Points,
                         ScoreDiffFormatted = $"+{row.Ratio}",
+                   
                     };
 
                     standingSchema.Rows.Add(rowSchema);
@@ -217,6 +237,36 @@ namespace Json.Services
             }
 
             return schemaJson;
+        }
+
+        private string GetAlpha2Code(string countryName)
+        {
+            // Add your logic to map country names to Alpha2 codes
+            switch (countryName.ToLower())
+            {
+                case "england":
+                    return "EN";
+                case "belgium":
+                    return "BE";
+                // Add more cases as needed
+                default:
+                    return "XX"; // Default value
+            }
+        }
+
+        private string GetAlpha3Code(string countryName)
+        {
+            // Add your logic to map country names to Alpha3 codes
+            switch (countryName.ToLower())
+            {
+                case "england":
+                    return "ENG";
+                case "belgium":
+                    return "BEL";
+                // Add more cases as needed
+                default:
+                    return "XXX"; // Default value
+            }
         }
 
         #region Model
